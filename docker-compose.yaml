@@ -1,0 +1,59 @@
+version: "3.10"
+services:
+  postgres:
+    image: postgres:alpine3.17
+    ports:
+      - 5432:5432
+    # volumes:
+    #   - psql:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD:  123
+      POSTGRES_USER:      dev
+      POSTGRES_DB:        inventory
+    networks:
+      local:
+        ipv4_address: 172.16.0.10
+
+  adminer:
+    image: adminer:standalone
+    ports:
+      - 8080:8080
+    restart: always
+    networks:
+      local:
+
+  sonarqube:
+    image:  sonarqube:9.9-community
+    restart: always
+    # volumes:
+    #   - sqube:/opt/sonarqube/data
+    #   - sqube:/opt/sonarqube/logs
+    #   - sqube:/opt/sonarqube/extensions
+    ports:
+      - 9000:9000
+    networks:
+      local:
+
+### Local system configuration ####
+
+volumes:
+  psql:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./db/postgresql
+  sqube:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./db/sonarqube
+
+networks:
+  local:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.0.0/24
+          gateway: 172.16.0.1

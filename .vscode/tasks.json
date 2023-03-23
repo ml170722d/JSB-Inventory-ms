@@ -1,0 +1,43 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run SonarQube scane",
+			"type": "shell",
+			"command": "${workspaceFolder}/gradlew",
+			"args": [
+				"sonar",
+				"-Dsonar.projectKey=inventory",
+				"-Dsonar.host.url=http://localhost:9000",
+				"-Dsonar.login=sqp_2689924d7021d7c3ffdb7ae0dd009968b2b2c8ad"
+			]
+		},
+		{
+			"label": "Run Gradle sync",
+			"type": "shell",
+			"command": "${workspaceFolder}/gradlew",
+			"args": [
+				"clean",
+				"--refresh-dependencies"
+			]
+		},
+		{
+			"label": "Run project",
+			"type": "shell",
+			"command": "${workspaceFolder}/gradlew",
+			"args": [
+				"bootRun"
+			]
+		},
+		{
+			"label": "docker-compose up",
+			"type": "shell",
+			"command": "docker-compose",
+			"args": [
+				"--project-directory",
+				"${workspaceFolder}",
+				"up"
+			]
+		}
+	]
+}
