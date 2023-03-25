@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,24 +25,11 @@ public class ArticleController {
 
   private final ArticleService articleService;
 
-  /**
-   * Create single new article.
-   *
-   * @param article Article object for creating new record.
-   * @return Article object if successful, null otherwise.
-   */
   @PostMapping("")
   public ResponseEntity<Article> createArticle(Article article) {
     return null;
   }
 
-  /**
-   * Create multiple new articles.
-   *
-   * @param articles List of Article objects for creating new records.
-   * @return List of Article object if successful.
-   *         If failed to create all, returns list of Article that were created.
-   */
   @PostMapping("/multiple")
   public ResponseEntity<Article> createArticles(@RequestBody List<Article> articles) {
     return null;
@@ -85,38 +71,20 @@ public class ArticleController {
     return ResponseEntity.ok().body(articleService.findByDistributor(name));
   }
 
-  /**
-   * Update single article.
-   *
-   * @param oldArticle Old data that should be changed.
-   * @param newArticle New data that should replace old data.
-   * @return New article data if successful, old data otherwise.
-   */
   @PutMapping("/{id}")
-  public Article updateArticle(@PathVariable Long id, @RequestBody Article newArticle) {
-    return null;
+  public ResponseEntity<Article> updateArticle(@PathVariable Long id, @RequestBody Article updatedArticle) {
+    return ResponseEntity.ok().body(articleService.updateArticle(id, updatedArticle));
   }
 
-  /**
-   * Delete single article.
-   *
-   * @param id of article that should be deleted.
-   * @return Article id that was deleted if successful, null otherwise.
-   */
   @DeleteMapping("/{id}")
-  public Long deleteArticle(@PathVariable Long id) {
-    return null;
+  public ResponseEntity<Object> deleteArticle(@PathVariable Long id) {
+    articleService.deleteArticle(id);
+    return ResponseEntity.ok().build();
   }
 
-  /**
-   * Delete multiple articles.
-   *
-   * @param articles List of Article objects that should be deleted.
-   * @return List of Article objects that were deleted if successful.
-   *         If failed to delete all, returns list of Article that were deleted.
-   */
   @DeleteMapping("/multiple")
-  public List<Long> deleteArticle(@RequestBody List<Long> ids) {
-    return null;
+  public ResponseEntity<Object> deleteArticles(@RequestBody List<Long> ids) {
+    articleService.deleteArticles(ids);
+    return ResponseEntity.ok().build();
   }
 }

@@ -17,6 +17,27 @@ public class ArticleService {
   private final ArticleRepository articleRepository;
 
   /**
+   * Create single new article.
+   *
+   * @param article Article object for creating new record.
+   * @return Article object if successful, null otherwise.
+   */
+  public Article createArticle(Article article) {
+    return articleRepository.save(article);
+  }
+
+  /**
+   * Create multiple new articles.
+   *
+   * @param articles List of Article objects for creating new records.
+   * @return List of Article object if successful.
+   *         If failed to create all, returns list of Article that were created.
+   */
+  public List<Article> createArticles(List<Article> articles) {
+    return articleRepository.saveAll(articles);
+  }
+
+  /**
    * Get all articles in inventory.
    *
    * @return List of all articles ever inserted.
@@ -89,11 +110,31 @@ public class ArticleService {
   /**
    * Update single article.
    *
-   * @param oldArticle Old data that should be changed.
-   * @param newArticle New data that should replace old data.
+   * @param id             Id of article.
+   * @param updatedArticle New data that should replace old data.
    * @return New article data if successful, old data otherwise.
    */
-  public Article updateArticle(Long id, Article newArticle) {
-    return null;
+  public Article updateArticle(Long id, Article updatedArticle) {
+    Article article = findById(id).orElseThrow();
+    updatedArticle.setId(article.getId());
+    return articleRepository.save(updatedArticle);
+  }
+
+  /**
+   * Delete single article.
+   *
+   * @param id of article that should be deleted.
+   */
+  public void deleteArticle(Long id) {
+    articleRepository.deleteById(id);
+  }
+
+  /**
+   * Delete multiple articles.
+   *
+   * @param articles List of Article objects that should be deleted.
+   */
+  public void deleteArticles(List<Long> ids) {
+    articleRepository.deleteAllById(ids);
   }
 }

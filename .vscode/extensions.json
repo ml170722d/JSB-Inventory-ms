@@ -5,6 +5,7 @@
     "ms-azuretools.vscode-docker",
     "richardwillis.vscode-gradle-extension-pack",
     "vscjava.vscode-lombok",
-    "oracle.oracledevtools"
+    "oracle.oracledevtools",
+    "rangav.vscode-thunder-client"
   ]
 }
