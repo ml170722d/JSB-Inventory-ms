@@ -4,6 +4,7 @@
     "vmware.vscode-boot-dev-pack",
     "ms-azuretools.vscode-docker",
     "richardwillis.vscode-gradle-extension-pack",
-    "vscjava.vscode-lombok"
+    "vscjava.vscode-lombok",
+    "oracle.oracledevtools"
   ]
 }
