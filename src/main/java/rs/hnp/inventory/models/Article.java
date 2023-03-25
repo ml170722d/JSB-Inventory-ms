@@ -1,8 +1,5 @@
 package rs.hnp.inventory.models;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +19,7 @@ public class Article {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "externalId")
+  @Column(name = "external_id")
   private String externalId;
   // @ManyToOne
   // @JoinColumn(name = "distributorId")
@@ -37,21 +34,8 @@ public class Article {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "buyingPrice")
+  @Column(name = "buying_price")
   private Long buyingPrice;
-  @Column(name = "sellingPrice")
+  @Column(name = "selling_price")
   private Long sellingPrice;
-
-  public Article(ResultSet rs) throws SQLException {
-    this.id = rs.getLong("id");
-    this.externalId = rs.getString("externalId");
-    // this.distributor = new Distributor(rs.getLong("distributorId"),
-    // rs.getString("distributorName"));
-    this.name = rs.getString("name");
-    this.unit = rs.getString("unit");
-    this.amount = rs.getLong("amount");
-    this.description = rs.getString("description");
-    this.buyingPrice = rs.getLong("buyingPrice");
-    this.sellingPrice = rs.getLong("sellingPrice");
-  }
 }

@@ -3,8 +3,7 @@ package rs.hnp.inventory.controllers;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,15 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.services.ArticleService;
 
 @RestController
 @RequestMapping("/article")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ArticleController {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ArticleController.class);
-  private final ArticleService articleService = new ArticleService();
+  private final ArticleService articleService;
 
   /**
    * Create single new article.
@@ -32,7 +32,7 @@ public class ArticleController {
    * @param article Article object for creating new record.
    * @return Article object if successful, null otherwise.
    */
-  @PostMapping("/")
+  @PostMapping("")
   public ResponseEntity<Article> createArticle(Article article) {
     return null;
   }
@@ -49,79 +49,40 @@ public class ArticleController {
     return null;
   }
 
-  @GetMapping("/")
+  @GetMapping("")
   public ResponseEntity<List<Article>> getAllArticle() {
-    try {
-      return ResponseEntity.ok().body(this.articleService.findAll());
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+    return ResponseEntity.ok().body(articleService.findAll());
   }
 
   @GetMapping("/available")
   public ResponseEntity<List<Article>> getAllAvailableArticle() {
-    try {
-      return ResponseEntity.ok().body(this.articleService.findAllAvailable());
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+    return ResponseEntity.ok().body(articleService.findAllAvailable());
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<Article> findById(@PathVariable Long id) {
-    try {
-      Optional<Article> article = this.articleService.findById(id);
-      if (article.isPresent())
-        return ResponseEntity.ok().body(article.get());
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-    return ResponseEntity.notFound().build();
+    Optional<Article> article = articleService.findById(id);
+    return ResponseEntity.ok().body(article.get());
   }
 
   @GetMapping("/name/{name}")
   public ResponseEntity<List<Article>> findByName(@PathVariable String name) {
-    try {
-      return ResponseEntity.ok().body(this.articleService.findByName(name));
-    } catch (IllegalArgumentException e) {
-      LOG.error(e.getMessage(), e);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-    return ResponseEntity.notFound().build();
+    return ResponseEntity.ok().body(articleService.findByName(name));
   }
 
-  /**
-   * Find article by external id.
-   *
-   * @param externalId ID of Article assigned by Distributor.
-   * @return List of Article object that match criteria, null otherwise.
-   */
   @GetMapping("/externalId/{externalId}")
-  public List<Article> findByExternalId(@PathVariable String externalId) {
-    return null;
+  public ResponseEntity<List<Article>> findByExternalId(@PathVariable String externalId) {
+    return ResponseEntity.ok().body(articleService.findByExternalId(externalId));
   }
 
-  /**
-   * Get list of Article objects from specific Distributor.
-   *
-   * @param id ID assigned to Distributor by the system.
-   * @return List of Article object by specified Distributor.
-   */
   @GetMapping("/distributor/{id}")
-  public List<Article> getByDistributor(@PathVariable Long id) {
-    return null;
+  public ResponseEntity<List<Article>> findByDistributor(@PathVariable Long id) {
+    return ResponseEntity.ok().body(articleService.findByDistributor(id));
   }
 
-  /**
-   * Get list of Article objects from specific Distributor.
-   *
-   * @param name Name of Distributor.
-   * @return List of Article object by specified Distributor.
-   */
   @GetMapping("/distributor/name/{name}")
-  public List<Article> getByDistributor(@PathVariable String name) {
-    return null;
+  public ResponseEntity<List<Article>> findByDistributor(@PathVariable String name) {
+    return ResponseEntity.ok().body(articleService.findByDistributor(name));
   }
 
   /**

@@ -1,32 +1,20 @@
 package rs.hnp.inventory.services;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.repositories.ArticleRepository;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ArticleService {
-  @Autowired
-  private ArticleRepository articleRepository;
 
-  @Autowired
-  private DataSource dataSource;
-
-  private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
+  private final ArticleRepository articleRepository;
 
   /**
    * Get all articles in inventory.
@@ -53,23 +41,8 @@ public class ArticleService {
    * @return List of articles that are currently available.
    * @throws Exception If processing of articles fails.
    */
-  public List<Article> findAllAvailable() throws SQLException {
-    String query = "SELECT * FROM articles AS a WHERE a.amount > 0";
-    List<Article> list = new ArrayList<>();
-
-    try (Connection connection = this.dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);) {
-
-      ResultSet rs = preparedStatement.executeQuery();
-      while (rs.next()) {
-        list.add(new Article(rs));
-      }
-    } catch (SQLException e) {
-      LOG.error("Error fetching currently available articals", e);
-      throw e;
-    }
-
-    return list;
+  public List<Article> findAllAvailable() {
+    return articleRepository.findAllAvailable();
   }
 
   /**
@@ -79,27 +52,48 @@ public class ArticleService {
    * @return List of Article object with the same name.
    * @throws Exception If processing of articles fails.
    */
-  public List<Article> findByName(String name) throws Exception, IllegalArgumentException {
-    if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException("Name parameter cannot be null or empty.");
-    }
+  public List<Article> findByName(String name) {
+    return articleRepository.findByName(name);
+  }
 
-    String query = "SELECT * FROM articles AS a WHERE a.name LIKE ?";
-    List<Article> list = new ArrayList<>();
+  /**
+   * Find article by external id.
+   *
+   * @param externalId ID of Article assigned by Distributor.
+   * @return List of Article object that match criteria, null otherwise.
+   */
+  public List<Article> findByExternalId(String externalId) {
+    return articleRepository.findByExternalId(externalId);
+  }
 
-    try (Connection connection = this.dataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+  /**
+   * Get list of Article objects from specific Distributor.
+   *
+   * @param id ID assigned to Distributor by the system.
+   * @return List of Article object by specified Distributor.
+   */
+  public List<Article> findByDistributor(Long id) {
+    return null;
+  }
 
-      preparedStatement.setString(1, "%" + name + "%");
-      ResultSet rs = preparedStatement.executeQuery();
-      while (rs.next()) {
-        list.add(new Article(rs));
-      }
-    } catch (Exception e) {
-      LOG.error("Error fetching articl(s) by name", e);
-      throw e;
-    }
+  /**
+   * Get list of Article objects from specific Distributor.
+   *
+   * @param name Name of Distributor.
+   * @return List of Article object by specified Distributor.
+   */
+  public List<Article> findByDistributor(String name) {
+    return null;
+  }
 
-    return list;
+  /**
+   * Update single article.
+   *
+   * @param oldArticle Old data that should be changed.
+   * @param newArticle New data that should replace old data.
+   * @return New article data if successful, old data otherwise.
+   */
+  public Article updateArticle(Long id, Article newArticle) {
+    return null;
   }
 }
