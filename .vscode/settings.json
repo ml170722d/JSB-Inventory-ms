@@ -8,5 +8,6 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "thunder-client.saveToWorkspace": true,
-  "thunder-client.workspaceRelativePath": ".vscode/thunder-tests"
+  "thunder-client.workspaceRelativePath": ".vscode/thunder-tests",
+  "spring-boot.ls.problem.boot2.JAVA_REPOSITORY": "HINT"
 }
