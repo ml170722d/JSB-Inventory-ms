@@ -26,13 +26,13 @@ public class ArticleController {
   private final ArticleService articleService;
 
   @PostMapping("")
-  public ResponseEntity<Article> createArticle(Article article) {
-    return null;
+  public ResponseEntity<Article> createArticle(@RequestBody Article article) {
+    return ResponseEntity.ok().body(articleService.createArticle(article));
   }
 
   @PostMapping("/multiple")
-  public ResponseEntity<Article> createArticles(@RequestBody List<Article> articles) {
-    return null;
+  public ResponseEntity<List<Article>> createArticles(@RequestBody List<Article> articles) {
+    return ResponseEntity.ok().body(articleService.createArticles(articles));
   }
 
   @GetMapping("")

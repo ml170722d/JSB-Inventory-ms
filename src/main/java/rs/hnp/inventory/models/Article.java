@@ -35,7 +35,7 @@ public class Article {
   private String description;
 
   @Column(name = "buying_price")
-  private Long buyingPrice;
+  private Long buying_price;
   @Column(name = "selling_price")
-  private Long sellingPrice;
+  private Long selling_price;
 }
