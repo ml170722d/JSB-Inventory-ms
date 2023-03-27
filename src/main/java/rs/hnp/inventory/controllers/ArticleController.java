@@ -3,8 +3,11 @@ package rs.hnp.inventory.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.services.ArticleService;
 
+@Validated
 @RestController
 @RequestMapping("/article")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -26,12 +30,12 @@ public class ArticleController {
   private final ArticleService articleService;
 
   @PostMapping("")
-  public ResponseEntity<Article> createArticle(@RequestBody Article article) {
+  public ResponseEntity<Article> createArticle(@Valid @RequestBody Article article) {
     return ResponseEntity.ok().body(articleService.createArticle(article));
   }
 
   @PostMapping("/multiple")
-  public ResponseEntity<List<Article>> createArticles(@RequestBody List<Article> articles) {
+  public ResponseEntity<List<Article>> createArticles(@Valid @RequestBody List<Article> articles) {
     return ResponseEntity.ok().body(articleService.createArticles(articles));
   }
 
@@ -46,44 +50,45 @@ public class ArticleController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Article> findById(@PathVariable Long id) {
+  public ResponseEntity<Article> findById(@Valid @PathVariable Long id) {
     Optional<Article> article = articleService.findById(id);
     return ResponseEntity.ok().body(article.get());
   }
 
   @GetMapping("/name/{name}")
-  public ResponseEntity<List<Article>> findByName(@PathVariable String name) {
+  public ResponseEntity<List<Article>> findByName(@Valid @PathVariable String name) {
     return ResponseEntity.ok().body(articleService.findByName(name));
   }
 
   @GetMapping("/externalId/{externalId}")
-  public ResponseEntity<List<Article>> findByExternalId(@PathVariable String externalId) {
+  public ResponseEntity<List<Article>> findByExternalId(@Valid @PathVariable String externalId) {
     return ResponseEntity.ok().body(articleService.findByExternalId(externalId));
   }
 
   @GetMapping("/distributor/{id}")
-  public ResponseEntity<List<Article>> findByDistributor(@PathVariable Long id) {
+  public ResponseEntity<List<Article>> findByDistributor(@Valid @PathVariable Long id) {
     return ResponseEntity.ok().body(articleService.findByDistributor(id));
   }
 
   @GetMapping("/distributor/name/{name}")
-  public ResponseEntity<List<Article>> findByDistributor(@PathVariable String name) {
+  public ResponseEntity<List<Article>> findByDistributor(@Valid @PathVariable String name) {
     return ResponseEntity.ok().body(articleService.findByDistributor(name));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Article> updateArticle(@PathVariable Long id, @RequestBody Article updatedArticle) {
+  public ResponseEntity<Article> updateArticle(@Valid @PathVariable Long id,
+      @Valid @RequestBody Article updatedArticle) {
     return ResponseEntity.ok().body(articleService.updateArticle(id, updatedArticle));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Object> deleteArticle(@PathVariable Long id) {
+  public ResponseEntity<Object> deleteArticle(@Valid @PathVariable Long id) {
     articleService.deleteArticle(id);
     return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/multiple")
-  public ResponseEntity<Object> deleteArticles(@RequestBody List<Long> ids) {
+  public ResponseEntity<Object> deleteArticles(@Valid @RequestBody List<Long> ids) {
     articleService.deleteArticles(ids);
     return ResponseEntity.ok().build();
   }
