@@ -1,10 +1,12 @@
 package rs.hnp.inventory.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.models.Article;
@@ -23,7 +25,11 @@ public class ArticleService {
    * @return Article object if successful, null otherwise.
    */
   public Article createArticle(Article article) {
-    return articleRepository.save(article);
+    try {
+      return articleRepository.save(article);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -34,7 +40,11 @@ public class ArticleService {
    *         If failed to create all, returns list of Article that were created.
    */
   public List<Article> createArticles(List<Article> articles) {
-    return articleRepository.saveAll(articles);
+    try {
+      return articleRepository.saveAll(articles);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -52,8 +62,8 @@ public class ArticleService {
    * @param id ID assigned to Article by the system.
    * @return Article object if found, null otherwise.
    */
-  public Optional<Article> findById(Long id) {
-    return articleRepository.findById(id);
+  public Article findById(Long id) {
+    return articleRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
   }
 
   /**
@@ -74,7 +84,10 @@ public class ArticleService {
    * @throws Exception If processing of articles fails.
    */
   public List<Article> findByName(String name) {
-    return articleRepository.findByName(name);
+    List<Article> list = articleRepository.findByName(name);
+    if (list.isEmpty())
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    return list;
   }
 
   /**
@@ -84,7 +97,10 @@ public class ArticleService {
    * @return List of Article object that match criteria, null otherwise.
    */
   public List<Article> findByExternalId(String externalId) {
-    return articleRepository.findByExternalId(externalId);
+    List<Article> list = articleRepository.findByExternalId(externalId);
+    if (list.isEmpty())
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    return list;
   }
 
   /**
@@ -115,7 +131,7 @@ public class ArticleService {
    * @return New article data if successful, old data otherwise.
    */
   public Article updateArticle(Long id, Article updatedArticle) {
-    Article article = findById(id).orElseThrow();
+    Article article = findById(id);
     updatedArticle.setId(article.getId());
     return articleRepository.save(updatedArticle);
   }
@@ -126,7 +142,11 @@ public class ArticleService {
    * @param id of article that should be deleted.
    */
   public void deleteArticle(Long id) {
-    articleRepository.deleteById(id);
+    try {
+      articleRepository.deleteById(id);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -135,6 +155,10 @@ public class ArticleService {
    * @param articles List of Article objects that should be deleted.
    */
   public void deleteArticles(List<Long> ids) {
-    articleRepository.deleteAllById(ids);
+    try {
+      articleRepository.deleteAllById(ids);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 }

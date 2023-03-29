@@ -17,7 +17,7 @@ public class Article {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "external_id")
+  @Column(name = "external_id", unique = true)
   private String externalId;
 
   @Column(name = "name")

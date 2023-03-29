@@ -21,8 +21,10 @@ dependencies {
 
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.1'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.0.5'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '3.0.5'
 	implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.5.3.Final'
 	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.0.0'
 }
 
 tasks.named('test') {

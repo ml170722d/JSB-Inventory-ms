@@ -1,7 +1,6 @@
 package rs.hnp.inventory.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -51,8 +50,8 @@ public class ArticleController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Article> findById(@Valid @PathVariable Long id) {
-    Optional<Article> article = articleService.findById(id);
-    return ResponseEntity.ok().body(article.get());
+    Article article = articleService.findById(id);
+    return ResponseEntity.ok().body(article);
   }
 
   @GetMapping("/name/{name}")
