@@ -5,6 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.models.Article;
@@ -30,12 +33,20 @@ public class ArticleController {
 
   @PostMapping("")
   public ResponseEntity<Article> createArticle(@Valid @RequestBody Article article) {
-    return ResponseEntity.ok().body(articleService.createArticle(article));
+    try {
+      return ResponseEntity.ok().body(articleService.createArticle(article));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   @PostMapping("/multiple")
   public ResponseEntity<List<Article>> createArticles(@Valid @RequestBody List<Article> articles) {
-    return ResponseEntity.ok().body(articleService.createArticles(articles));
+    try {
+      return ResponseEntity.ok().body(articleService.createArticles(articles));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   @GetMapping("")
@@ -50,18 +61,24 @@ public class ArticleController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Article> findById(@Valid @PathVariable Long id) {
-    Article article = articleService.findById(id);
+    Article article = articleService.findById(id).orElseThrow(ResourceNotFoundException::new);
     return ResponseEntity.ok().body(article);
   }
 
   @GetMapping("/name/{name}")
   public ResponseEntity<List<Article>> findByName(@Valid @PathVariable String name) {
-    return ResponseEntity.ok().body(articleService.findByName(name));
+    List<Article> list = articleService.findByName(name);
+    if (list.isEmpty())
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    return ResponseEntity.ok().body(list);
   }
 
   @GetMapping("/externalId/{externalId}")
   public ResponseEntity<List<Article>> findByExternalId(@Valid @PathVariable String externalId) {
-    return ResponseEntity.ok().body(articleService.findByExternalId(externalId));
+    List<Article> list = articleService.findByExternalId(externalId);
+    if (list.isEmpty())
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    return ResponseEntity.ok().body(list);
   }
 
   @GetMapping("/distributor/{id}")
@@ -77,18 +94,30 @@ public class ArticleController {
   @PutMapping("/{id}")
   public ResponseEntity<Article> updateArticle(@Valid @PathVariable Long id,
       @Valid @RequestBody Article updatedArticle) {
-    return ResponseEntity.ok().body(articleService.updateArticle(id, updatedArticle));
+    try {
+      return ResponseEntity.ok().body(articleService.updateArticle(id, updatedArticle));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Object> deleteArticle(@Valid @PathVariable Long id) {
-    articleService.deleteArticle(id);
+    try {
+      articleService.deleteArticle(id);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
     return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/multiple")
   public ResponseEntity<Object> deleteArticles(@Valid @RequestBody List<Long> ids) {
-    articleService.deleteArticles(ids);
+    try {
+      articleService.deleteArticles(ids);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
     return ResponseEntity.ok().build();
   }
 }
