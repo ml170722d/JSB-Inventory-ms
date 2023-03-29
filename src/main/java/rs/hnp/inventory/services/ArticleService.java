@@ -3,7 +3,6 @@ package rs.hnp.inventory.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import rs.hnp.inventory.repositories.ArticleRepository;
 public class ArticleService {
 
   private final ArticleRepository articleRepository;
-  private final ModelMapper modelMapper;
 
   /**
    * Create single new article.
@@ -118,9 +116,9 @@ public class ArticleService {
    * @return New article data if successful, old data otherwise.
    */
   public Article updateArticle(Long id, Article updatedArticle) {
-    Article existingArticle = findById(id).orElseThrow(ResourceNotFoundException::new);
-    modelMapper.map(updatedArticle, existingArticle);
-    return articleRepository.save(existingArticle);
+    Article article = findById(id).orElseThrow(ResourceNotFoundException::new);
+    updatedArticle.setId(article.getId());
+    return articleRepository.save(updatedArticle);
   }
 
   /**
