@@ -9,7 +9,7 @@
 				"sonar",
 				"-Dsonar.projectKey=inventory",
 				"-Dsonar.host.url=http://localhost:9000",
-				"-Dsonar.login=sqp_2689924d7021d7c3ffdb7ae0dd009968b2b2c8ad"
+				"-Dsonar.login=sqp_d8ccd3d0eeeadc26e3558b7ce5f01e2504d65146"
 			]
 		},
 		{
