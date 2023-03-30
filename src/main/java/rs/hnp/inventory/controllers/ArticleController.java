@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -91,14 +92,12 @@ public class ArticleController {
     return ResponseEntity.ok().body(articleService.findByDistributor(name));
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<Article> updateArticle(@Valid @PathVariable Long id,
-      @Valid @RequestBody Article updatedArticle) {
-    try {
-      return ResponseEntity.ok().body(articleService.updateArticle(id, updatedArticle));
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
+  @PutMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+  public ResponseEntity<Article> updateArticle(
+          @Valid @PathVariable Long id,
+          @Valid @RequestBody Article updatedArticle
+  ) {
+      return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle);
   }
 
   @DeleteMapping("/{id}")

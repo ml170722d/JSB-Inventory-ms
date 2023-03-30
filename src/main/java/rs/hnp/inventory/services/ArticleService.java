@@ -118,7 +118,7 @@ public class ArticleService {
    * @return New article data if successful, old data otherwise.
    */
   public Article updateArticle(Long id, Article updatedArticle) {
-    Article existingArticle = findById(id).orElseThrow(ResourceNotFoundException::new);
+    Article existingArticle = findById(id).orElseThrow(ApiExceptionFactory::articleNotFound);
     modelMapper.map(updatedArticle, existingArticle);
     return articleRepository.save(existingArticle);
   }
