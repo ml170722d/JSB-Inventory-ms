@@ -1,7 +1,7 @@
 package rs.hnp.inventory.services;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +9,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import rs.hnp.inventory.dto.article.ArticleDTO;
+import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.repositories.ArticleRepository;
 
@@ -19,14 +21,20 @@ public class ArticleService {
   private final ArticleRepository articleRepository;
   private final ModelMapper modelMapper;
 
+  private Article getArticleById(Long id) {
+    return articleRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+  }
+
   /**
    * Create single new article.
    *
    * @param article Article object for creating new record.
    * @return Article object if successful, null otherwise.
    */
-  public Article createArticle(Article article) {
-    return articleRepository.save(article);
+  public ArticleDTO createArticle(ArticleDTO article) {
+    Article newArticle = modelMapper.map(article, Article.class);
+    ArticleDTO dto = modelMapper.map(articleRepository.save(newArticle), ArticleDTO.class);
+    return dto;
   }
 
   /**
@@ -36,8 +44,16 @@ public class ArticleService {
    * @return List of Article object if successful.
    *         If failed to create all, returns list of Article that were created.
    */
-  public List<Article> createArticles(List<Article> articles) {
-    return articleRepository.saveAll(articles);
+  public List<ArticleDTO> createArticle(List<ArticleDTO> articles) {
+    List<Article> list = articles.stream()
+        .map(article -> modelMapper.map(article, Article.class))
+        .collect(Collectors.toList());
+
+    List<ArticleDTO> saved = articleRepository.saveAll(list)
+        .stream()
+        .map(article -> modelMapper.map(article, ArticleDTO.class))
+        .collect(Collectors.toList());
+    return saved;
   }
 
   /**
@@ -45,8 +61,12 @@ public class ArticleService {
    *
    * @return List of all articles ever inserted.
    */
-  public List<Article> findAll() {
-    return articleRepository.findAll();
+  public List<ArticleDTO> findAll() {
+    List<ArticleDTO> list = articleRepository.findAll()
+        .stream()
+        .map(article -> modelMapper.map(article, ArticleDTO.class))
+        .collect(Collectors.toList());
+    return list;
   }
 
   /**
@@ -55,8 +75,10 @@ public class ArticleService {
    * @param id ID assigned to Article by the system.
    * @return Article object if found, null otherwise.
    */
-  public Optional<Article> findById(Long id) {
-    return articleRepository.findById(id);
+  public ArticleDTO findById(Long id) {
+    Article article = getArticleById(id);
+    ArticleDTO dto = modelMapper.map(article, ArticleDTO.class);
+    return dto;
   }
 
   /**
@@ -65,8 +87,12 @@ public class ArticleService {
    * @return List of articles that are currently available.
    * @throws Exception If processing of articles fails.
    */
-  public List<Article> findAllAvailable() {
-    return articleRepository.findAllAvailable();
+  public List<ArticleDTO> findAllAvailable() {
+    List<ArticleDTO> list = articleRepository.findAllAvailable()
+        .stream()
+        .map(article -> modelMapper.map(article, ArticleDTO.class))
+        .collect(Collectors.toList());
+    return list;
   }
 
   /**
@@ -76,8 +102,12 @@ public class ArticleService {
    * @return List of Article object with the same name.
    * @throws Exception If processing of articles fails.
    */
-  public List<Article> findByName(String name) {
-    return articleRepository.findByName(name);
+  public List<ArticleDTO> findByName(String name) {
+    List<ArticleDTO> list = articleRepository.findByName(name)
+        .stream()
+        .map(article -> modelMapper.map(article, ArticleDTO.class))
+        .collect(Collectors.toList());
+    return list;
   }
 
   /**
@@ -86,28 +116,12 @@ public class ArticleService {
    * @param externalId ID of Article assigned by Distributor.
    * @return List of Article object that match criteria, null otherwise.
    */
-  public List<Article> findByExternalId(String externalId) {
-    return articleRepository.findByExternalId(externalId);
-  }
-
-  /**
-   * Get list of Article objects from specific Distributor.
-   *
-   * @param id ID assigned to Distributor by the system.
-   * @return List of Article object by specified Distributor.
-   */
-  public List<Article> findByDistributor(Long id) {
-    return null;
-  }
-
-  /**
-   * Get list of Article objects from specific Distributor.
-   *
-   * @param name Name of Distributor.
-   * @return List of Article object by specified Distributor.
-   */
-  public List<Article> findByDistributor(String name) {
-    return null;
+  public List<ArticleDTO> findByExternalId(String externalId) {
+    List<ArticleDTO> list = articleRepository.findByExternalId(externalId)
+        .stream()
+        .map(article -> modelMapper.map(article, ArticleDTO.class))
+        .collect(Collectors.toList());
+    return list;
   }
 
   /**
@@ -117,10 +131,11 @@ public class ArticleService {
    * @param updatedArticle New data that should replace old data.
    * @return New article data if successful, old data otherwise.
    */
-  public Article updateArticle(Long id, Article updatedArticle) {
-    Article existingArticle = findById(id).orElseThrow(ResourceNotFoundException::new);
+  public ArticleDTO updateArticle(Long id, ArticleUpdateDTO updatedArticle) {
+    Article existingArticle = getArticleById(id);
     modelMapper.map(updatedArticle, existingArticle);
-    return articleRepository.save(existingArticle);
+    ArticleDTO dto = modelMapper.map(articleRepository.save(existingArticle), ArticleDTO.class);
+    return dto;
   }
 
   /**
@@ -137,7 +152,7 @@ public class ArticleService {
    *
    * @param articles List of Article objects that should be deleted.
    */
-  public void deleteArticles(List<Long> ids) {
+  public void deleteArticle(List<Long> ids) {
     articleRepository.deleteAllById(ids);
   }
 }
