@@ -92,12 +92,11 @@ public class ArticleController {
     return ResponseEntity.ok().body(articleService.findByDistributor(name));
   }
 
-  @PutMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+  @PutMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
   public ResponseEntity<Article> updateArticle(
-          @Valid @PathVariable Long id,
-          @Valid @RequestBody Article updatedArticle
-  ) {
-      return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle));
+      @Valid @PathVariable Long id,
+      @Valid @RequestBody Article updatedArticle) {
+    return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle));
   }
 
   @DeleteMapping("/{id}")

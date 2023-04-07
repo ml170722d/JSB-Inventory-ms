@@ -8,8 +8,11 @@ import org.modelmapper.ModelMapper;
 public class AppConfig {
 
   @Bean
-  public ModelMapper articleModelMapper() {
-    return new ModelMapper();
+  public ModelMapper modelMapper() {
+    ModelMapper modelMapper = new ModelMapper();
+    modelMapper.getConfiguration().setSkipNullEnabled(true);
+
+    return modelMapper;
   }
 
 }
