@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import rs.hnp.inventory.dto.article.ArticleDTO;
-import rs.hnp.inventory.models.Article;
+import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
 import rs.hnp.inventory.services.ArticleService;
 
 import javax.validation.Valid;
@@ -25,22 +25,12 @@ public class ArticleController {
 
   @PostMapping("")
   public ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO article) {
-    try {
-      ArticleDTO created = articleService.createArticle(article);
-      return ResponseEntity.ok().body(created);
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
+      return ResponseEntity.ok(articleService.createArticle(article));
   }
 
-  @PostMapping("/multiple")
+  @PostMapping(value = "/multiple")
   public ResponseEntity<List<ArticleDTO>> createArticles(@Valid @RequestBody List<ArticleDTO> articles) {
-    try {
-      List<ArticleDTO> list = articleService.createArticle(articles);
-      return ResponseEntity.ok().body(list);
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
+      return ResponseEntity.ok(articleService.createArticles(articles));
   }
 
   @GetMapping("")
@@ -78,9 +68,9 @@ public class ArticleController {
   }
 
   @PutMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<Article> updateArticle(
+  public ResponseEntity<ArticleDTO> updateArticle(
           @Valid @PathVariable Long id,
-          @Valid @RequestBody Article updatedArticle
+          @Valid @RequestBody ArticleUpdateDTO updatedArticle
   ) {
     return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle));
   }
