@@ -5,12 +5,12 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.dto.article.ArticleDTO;
 import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
+import rs.hnp.inventory.exceptions.ApiExceptionFactory;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.repositories.ArticleRepository;
 
@@ -131,8 +131,8 @@ public class ArticleService {
    * @param updatedArticle New data that should replace old data.
    * @return New article data if successful, old data otherwise.
    */
-  public ArticleDTO updateArticle(Long id, ArticleUpdateDTO updatedArticle) {
-    Article existingArticle = getArticleById(id);
+  public Article updateArticle(Long id, Article updatedArticle) {
+    Article existingArticle = findById(id).orElseThrow(ResourceNotFoundException::new);
     modelMapper.map(updatedArticle, existingArticle);
     ArticleDTO dto = modelMapper.map(articleRepository.save(existingArticle), ArticleDTO.class);
     return dto;

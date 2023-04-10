@@ -1,27 +1,19 @@
 package rs.hnp.inventory.controllers;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.dto.article.ArticleDTO;
-import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
+import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.services.ArticleService;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Validated
 @RestController
@@ -85,15 +77,12 @@ public class ArticleController {
     return ResponseEntity.ok().body(list);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<ArticleDTO> updateArticle(@Valid @PathVariable Long id,
-      @Valid @RequestBody ArticleUpdateDTO updatedArticle) {
-    try {
-      ArticleDTO dto = articleService.updateArticle(id, updatedArticle);
-      return ResponseEntity.ok().body(dto);
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
+  @PutMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+  public ResponseEntity<Article> updateArticle(
+          @Valid @PathVariable Long id,
+          @Valid @RequestBody Article updatedArticle
+  ) {
+    return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle));
   }
 
   @DeleteMapping("/{id}")
