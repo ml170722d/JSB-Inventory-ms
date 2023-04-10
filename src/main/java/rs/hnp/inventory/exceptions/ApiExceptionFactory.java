@@ -2,10 +2,10 @@ package rs.hnp.inventory.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ApiExceptionFactory {
 
     public static ApiException articleNotFound() {
