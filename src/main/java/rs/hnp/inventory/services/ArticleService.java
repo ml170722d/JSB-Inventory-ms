@@ -1,21 +1,21 @@
 package rs.hnp.inventory.services;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.dto.article.ArticleDTO;
 import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.repositories.ArticleRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
+@Slf4j
 public class ArticleService {
 
   private final ArticleRepository articleRepository;
@@ -32,9 +32,10 @@ public class ArticleService {
    * @return Article object if successful, null otherwise.
    */
   public ArticleDTO createArticle(ArticleDTO article) {
-    Article newArticle = modelMapper.map(article, Article.class);
-    ArticleDTO dto = modelMapper.map(articleRepository.save(newArticle), ArticleDTO.class);
-    return dto;
+     articleRepository.findByExternalId(article.getExternalId()).ifPresent(
+             (articleDTO) -> {throw new RuntimeException("Throw some custom exception - article with id \" + articleDTO.getId() + \" is present in the DB.");}
+     );
+     return modelMapper.map(articleRepository.save(modelMapper.map(article, Article.class)), ArticleDTO.class);
   }
 
   /**
@@ -44,16 +45,15 @@ public class ArticleService {
    * @return List of Article object if successful.
    *         If failed to create all, returns list of Article that were created.
    */
-  public List<ArticleDTO> createArticle(List<ArticleDTO> articles) {
-    List<Article> list = articles.stream()
-        .map(article -> modelMapper.map(article, Article.class))
-        .collect(Collectors.toList());
+  public List<ArticleDTO> createArticles(List<ArticleDTO> articles) {
 
-    List<ArticleDTO> saved = articleRepository.saveAll(list)
+    List<Article> newArticles = articles.stream()
+        .filter(articleDTO -> articleRepository.findByExternalId(articleDTO.getExternalId()).isEmpty())
+        .map(article -> modelMapper.map(article, Article.class)).toList();
+
+    return articleRepository.saveAll(newArticles)
         .stream()
-        .map(article -> modelMapper.map(article, ArticleDTO.class))
-        .collect(Collectors.toList());
-    return saved;
+        .map(article -> modelMapper.map(article, ArticleDTO.class)).toList();
   }
 
   /**
@@ -150,7 +150,7 @@ public class ArticleService {
   /**
    * Delete multiple articles.
    *
-   * @param articles List of Article objects that should be deleted.
+   * @param ids List of Article objects that should be deleted.
    */
   public void deleteArticle(List<Long> ids) {
     articleRepository.deleteAllById(ids);
