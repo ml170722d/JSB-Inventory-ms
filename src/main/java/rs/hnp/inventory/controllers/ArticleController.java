@@ -5,7 +5,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
-import rs.hnp.inventory.models.Article;
+import rs.hnp.inventory.dto.article.ArticleDTO;
+import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
 import rs.hnp.inventory.services.ArticleService;
 
 @Validated
@@ -33,70 +33,68 @@ public class ArticleController {
   private final ArticleService articleService;
 
   @PostMapping("")
-  public ResponseEntity<Article> createArticle(@Valid @RequestBody Article article) {
+  public ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO article) {
     try {
-      return ResponseEntity.ok().body(articleService.createArticle(article));
+      ArticleDTO created = articleService.createArticle(article);
+      return ResponseEntity.ok().body(created);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
   }
 
   @PostMapping("/multiple")
-  public ResponseEntity<List<Article>> createArticles(@Valid @RequestBody List<Article> articles) {
+  public ResponseEntity<List<ArticleDTO>> createArticles(@Valid @RequestBody List<ArticleDTO> articles) {
     try {
-      return ResponseEntity.ok().body(articleService.createArticles(articles));
+      List<ArticleDTO> list = articleService.createArticle(articles);
+      return ResponseEntity.ok().body(list);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
   }
 
   @GetMapping("")
-  public ResponseEntity<List<Article>> getAllArticle() {
-    return ResponseEntity.ok().body(articleService.findAll());
+  public ResponseEntity<List<ArticleDTO>> getAllArticle() {
+    List<ArticleDTO> list = articleService.findAll();
+    return ResponseEntity.ok().body(list);
   }
 
   @GetMapping("/available")
-  public ResponseEntity<List<Article>> getAllAvailableArticle() {
-    return ResponseEntity.ok().body(articleService.findAllAvailable());
+  public ResponseEntity<List<ArticleDTO>> getAllAvailableArticle() {
+    List<ArticleDTO> list = articleService.findAllAvailable();
+    return ResponseEntity.ok().body(list);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Article> findById(@Valid @PathVariable Long id) {
-    Article article = articleService.findById(id).orElseThrow(ResourceNotFoundException::new);
+  public ResponseEntity<ArticleDTO> findById(@Valid @PathVariable Long id) {
+    ArticleDTO article = articleService.findById(id);
     return ResponseEntity.ok().body(article);
   }
 
   @GetMapping("/name/{name}")
-  public ResponseEntity<List<Article>> findByName(@Valid @PathVariable String name) {
-    List<Article> list = articleService.findByName(name);
+  public ResponseEntity<List<ArticleDTO>> findByName(@Valid @PathVariable String name) {
+    List<ArticleDTO> list = articleService.findByName(name);
     if (list.isEmpty())
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     return ResponseEntity.ok().body(list);
   }
 
   @GetMapping("/externalId/{externalId}")
-  public ResponseEntity<List<Article>> findByExternalId(@Valid @PathVariable String externalId) {
-    List<Article> list = articleService.findByExternalId(externalId);
+  public ResponseEntity<List<ArticleDTO>> findByExternalId(@Valid @PathVariable String externalId) {
+    List<ArticleDTO> list = articleService.findByExternalId(externalId);
     if (list.isEmpty())
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     return ResponseEntity.ok().body(list);
   }
 
-  @GetMapping("/distributor/{id}")
-  public ResponseEntity<List<Article>> findByDistributor(@Valid @PathVariable Long id) {
-    return ResponseEntity.ok().body(articleService.findByDistributor(id));
-  }
-
-  @GetMapping("/distributor/name/{name}")
-  public ResponseEntity<List<Article>> findByDistributor(@Valid @PathVariable String name) {
-    return ResponseEntity.ok().body(articleService.findByDistributor(name));
-  }
-
-  @PutMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE })
-  public ResponseEntity<Article> updateArticle(
-      @Valid @PathVariable Long id,
-      @Valid @RequestBody Article updatedArticle) {
-    return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle));
+  @PutMapping("/{id}")
+  public ResponseEntity<ArticleDTO> updateArticle(@Valid @PathVariable Long id,
+      @Valid @RequestBody ArticleUpdateDTO updatedArticle) {
+    try {
+      ArticleDTO dto = articleService.updateArticle(id, updatedArticle);
+      return ResponseEntity.ok().body(dto);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
   }
 
   @DeleteMapping("/{id}")
@@ -112,7 +110,7 @@ public class ArticleController {
   @DeleteMapping("/multiple")
   public ResponseEntity<Object> deleteArticles(@Valid @RequestBody List<Long> ids) {
     try {
-      articleService.deleteArticles(ids);
+      articleService.deleteArticle(ids);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }

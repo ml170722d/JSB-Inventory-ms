@@ -1,8 +1,12 @@
-package rs.hnp.inventory.dto;
+package rs.hnp.inventory.dto.article;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class ArticleDTO {
   private Long id;
   private String externalId;

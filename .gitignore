@@ -35,9 +35,4 @@ out/
 
 ### VS Code ###
 # .vscode/
-
-### Developement env ###
-db/*/*
-
-### Keep project structure ###
-!db/**/.gitkeep
+.vscode/thunder-tests/
