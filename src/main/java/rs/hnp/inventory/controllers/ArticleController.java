@@ -23,7 +23,7 @@ public class ArticleController {
 
   private final ArticleService articleService;
 
-  @PostMapping("")
+  @PostMapping(value = "")
   public ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO article) {
       return ResponseEntity.ok(articleService.createArticle(article));
   }
@@ -33,25 +33,24 @@ public class ArticleController {
       return ResponseEntity.ok(articleService.createArticles(articles));
   }
 
-  @GetMapping("")
+  @GetMapping(value = "")
   public ResponseEntity<List<ArticleDTO>> getAllArticle() {
     List<ArticleDTO> list = articleService.findAll();
     return ResponseEntity.ok().body(list);
   }
 
-  @GetMapping("/available")
+  @GetMapping(value = "/available")
   public ResponseEntity<List<ArticleDTO>> getAllAvailableArticle() {
     List<ArticleDTO> list = articleService.findAllAvailable();
     return ResponseEntity.ok().body(list);
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<ArticleDTO> findById(@Valid @PathVariable Long id) {
-    ArticleDTO article = articleService.findById(id);
-    return ResponseEntity.ok().body(article);
+  @GetMapping(value = "/{id}")
+  public ResponseEntity<ArticleDTO> findById(@PathVariable(name = "id") Long id) {
+    return ResponseEntity.ok().body(articleService.findById(id));
   }
 
-  @GetMapping("/name/{name}")
+  @GetMapping(value = "/name/{name}")
   public ResponseEntity<List<ArticleDTO>> findByName(@Valid @PathVariable String name) {
     List<ArticleDTO> list = articleService.findByName(name);
     if (list.isEmpty())
@@ -59,7 +58,7 @@ public class ArticleController {
     return ResponseEntity.ok().body(list);
   }
 
-  @GetMapping("/externalId/{externalId}")
+  @GetMapping(value = "/externalId/{externalId}")
   public ResponseEntity<List<ArticleDTO>> findByExternalId(@Valid @PathVariable String externalId) {
     List<ArticleDTO> list = articleService.findByExternalId(externalId);
     if (list.isEmpty())
@@ -75,7 +74,7 @@ public class ArticleController {
     return ResponseEntity.ok(articleService.updateArticle(id, updatedArticle));
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping(value = "/{id}")
   public ResponseEntity<Object> deleteArticle(@Valid @PathVariable Long id) {
     try {
       articleService.deleteArticle(id);
@@ -85,7 +84,7 @@ public class ArticleController {
     return ResponseEntity.ok().build();
   }
 
-  @DeleteMapping("/multiple")
+  @DeleteMapping(value = "/multiple")
   public ResponseEntity<Object> deleteArticles(@Valid @RequestBody List<Long> ids) {
     try {
       articleService.deleteArticle(ids);

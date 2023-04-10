@@ -3,10 +3,11 @@ package rs.hnp.inventory.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import rs.hnp.inventory.dto.article.ArticleDTO;
 import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
+import rs.hnp.inventory.exceptions.ApiException;
+import rs.hnp.inventory.exceptions.ApiExceptionFactory;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.repositories.ArticleRepository;
 
@@ -22,7 +23,7 @@ public class ArticleService {
   private final ModelMapper modelMapper;
 
   private Article getArticleById(Long id) {
-    return articleRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    return articleRepository.findById(id).orElseThrow(ApiExceptionFactory::articleNotFound);
   }
 
   /**
@@ -31,9 +32,9 @@ public class ArticleService {
    * @param article Article object for creating new record.
    * @return Article object if successful, null otherwise.
    */
-  public ArticleDTO createArticle(ArticleDTO article) {
+  public ArticleDTO createArticle(ArticleDTO article) throws ApiException{
      articleRepository.findByExternalId(article.getExternalId()).ifPresent(
-             (articleDTO) -> {throw new RuntimeException("Throw some custom exception - article with id \" + articleDTO.getId() + \" is present in the DB.");}
+             (articleDTO) -> {throw ApiExceptionFactory.articlePresent();}
      );
      return modelMapper.map(articleRepository.save(modelMapper.map(article, Article.class)), ArticleDTO.class);
   }

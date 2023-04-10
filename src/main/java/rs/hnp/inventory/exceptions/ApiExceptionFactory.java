@@ -1,15 +1,18 @@
 package rs.hnp.inventory.exceptions;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiExceptionFactory {
 
     public static ApiException articleNotFound() {
         return new ApiException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, "Article not found");
+    }
+
+    public static ApiException articlePresent() {
+        return new ApiException(HttpStatus.CONFLICT, ErrorCode.CONFLICT, "Article present in the DB");
     }
 
 }
