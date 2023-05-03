@@ -9,5 +9,6 @@
   },
   "thunder-client.saveToWorkspace": true,
   "thunder-client.workspaceRelativePath": ".vscode/thunder-tests",
-  "spring-boot.ls.problem.boot2.JAVA_REPOSITORY": "HINT"
+  "spring-boot.ls.problem.boot2.JAVA_REPOSITORY": "HINT",
+  "spring-boot.ls.problem.version-validation.UPDATE_LATEST_PATCH_VERSION": "HINT"
 }
