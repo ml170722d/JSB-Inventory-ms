@@ -1,9 +1,12 @@
 package rs.hnp.inventory.services;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 import rs.hnp.inventory.dto.article.ArticleDTO;
 import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
 import rs.hnp.inventory.exceptions.ApiException;
@@ -11,12 +14,8 @@ import rs.hnp.inventory.exceptions.ApiExceptionFactory;
 import rs.hnp.inventory.models.Article;
 import rs.hnp.inventory.repositories.ArticleRepository;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ArticleService {
 
   private final ArticleRepository articleRepository;
@@ -32,11 +31,12 @@ public class ArticleService {
    * @param article Article object for creating new record.
    * @return Article object if successful, null otherwise.
    */
-  public ArticleDTO createArticle(ArticleDTO article) throws ApiException{
-     articleRepository.findByExternalId(article.getExternalId()).ifPresent(
-             (articleDTO) -> {throw ApiExceptionFactory.articlePresent();}
-     );
-     return modelMapper.map(articleRepository.save(modelMapper.map(article, Article.class)), ArticleDTO.class);
+  public ArticleDTO createArticle(ArticleDTO article) throws ApiException {
+    articleRepository.findByExternalId(article.getExternalId()).ifPresent(
+        (articleDTO) -> {
+          throw ApiExceptionFactory.articlePresent();
+        });
+    return modelMapper.map(articleRepository.save(modelMapper.map(article, Article.class)), ArticleDTO.class);
   }
 
   /**
@@ -86,8 +86,9 @@ public class ArticleService {
    * @return List of articles that are currently available.
    */
   public List<ArticleDTO> findAllAvailable() {
-    return articleRepository.findAllAvailable()
+    return articleRepository.findAll()
         .stream()
+        .filter(article -> article.getAmount() > 0)
         .map(article -> modelMapper.map(article, ArticleDTO.class))
         .collect(Collectors.toList());
   }
