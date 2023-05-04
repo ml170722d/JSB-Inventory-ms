@@ -1,23 +1,29 @@
 package rs.hnp.inventory.repositories;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import rs.hnp.inventory.models.Article;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+
+import rs.hnp.inventory.AbstractTestcontainers;
+import rs.hnp.inventory.InventoryApplication;
+import rs.hnp.inventory.models.Article;
+
 @DataJpaTest
-public class ArticleRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(InventoryApplication.class)
+public class ArticleRepositoryTest extends AbstractTestcontainers {
 
   @Autowired
   private ArticleRepository unitTest;
 
-  @AfterEach
+  @BeforeEach
   void tearDown() {
     unitTest.deleteAll();
   }
