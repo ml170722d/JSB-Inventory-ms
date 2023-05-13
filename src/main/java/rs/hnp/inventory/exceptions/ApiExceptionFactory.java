@@ -15,4 +15,8 @@ public class ApiExceptionFactory {
         return new ApiException(HttpStatus.CONFLICT, ErrorCode.CONFLICT, "Article present in the DB");
     }
 
+    public static ApiException articleNotExists() {
+        return new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, "Requested article does not exist");
+    }
+
 }
