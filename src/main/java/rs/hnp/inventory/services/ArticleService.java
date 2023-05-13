@@ -1,5 +1,6 @@
 package rs.hnp.inventory.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,146 +8,156 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import rs.hnp.inventory.dao.ArticleDAO;
 import rs.hnp.inventory.dto.article.ArticleDTO;
-import rs.hnp.inventory.dto.article.ArticleUpdateDTO;
-import rs.hnp.inventory.exceptions.ApiException;
 import rs.hnp.inventory.exceptions.ApiExceptionFactory;
 import rs.hnp.inventory.models.Article;
-import rs.hnp.inventory.repositories.ArticleRepository;
+import rs.hnp.inventory.utils.records.ArticleRegistrationRequest;
+import rs.hnp.inventory.utils.records.ArticleUpdateRequest;
 
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
 
-  private final ArticleRepository articleRepository;
   private final ModelMapper modelMapper;
+  private final ArticleDAO articleDAO;
 
-  private Article getArticleById(Long id) {
-    return articleRepository.findById(id).orElseThrow(ApiExceptionFactory::articleNotFound);
+  private void checkIfArticleExistsOrThrow(Long id) {
+    if (!articleDAO.existsArticleById(id)) {
+      throw ApiExceptionFactory.articleNotFound();
+    }
   }
 
-  /**
-   * Create single new article.
-   *
-   * @param article Article object for creating new record.
-   * @return Article object if successful, null otherwise.
-   */
-  public ArticleDTO createArticle(ArticleDTO article) throws ApiException {
-    articleRepository.findByExternalId(article.getExternalId()).ifPresent(
-        (articleDTO) -> {
-          throw ApiExceptionFactory.articlePresent();
-        });
-    return modelMapper.map(articleRepository.save(modelMapper.map(article, Article.class)), ArticleDTO.class);
-  }
-
-  /**
-   * Create multiple new articles.
-   *
-   * @param articles List of Article objects for creating new records.
-   * @return List of Article object if successful.
-   *         If failed to create all, returns list of Article that were created.
-   */
-  public List<ArticleDTO> createArticles(List<ArticleDTO> articles) {
-
-    List<Article> newArticles = articles.stream()
-        .filter(articleDTO -> articleRepository.findByExternalId(articleDTO.getExternalId()).isEmpty())
-        .map(article -> modelMapper.map(article, Article.class)).toList();
-
-    return articleRepository.saveAll(newArticles)
-        .stream()
-        .map(article -> modelMapper.map(article, ArticleDTO.class)).toList();
-  }
-
-  /**
-   * Get all articles in inventory.
-   *
-   * @return List of all articles ever inserted.
-   */
-  public List<ArticleDTO> findAll() {
-    return articleRepository.findAll()
+  public List<ArticleDTO> getAllArticles() {
+    return articleDAO.selectAllArticles()
         .stream()
         .map(article -> modelMapper.map(article, ArticleDTO.class))
         .toList();
   }
 
-  /**
-   * Find article by id.
-   *
-   * @param id ID assigned to Article by the system.
-   * @return Article object if found, null otherwise.
-   */
-  public ArticleDTO findById(Long id) {
-    Article article = getArticleById(id);
+  public ArticleDTO getArticleById(Long id) {
+    Article article = articleDAO.selectArticleById(id).orElseThrow(ApiExceptionFactory::articleNotFound);
     return modelMapper.map(article, ArticleDTO.class);
   }
 
-  /**
-   * Get all available articles in inventory.
-   *
-   * @return List of articles that are currently available.
-   */
-  public List<ArticleDTO> findAllAvailable() {
-    return articleRepository.findAll()
+  public List<ArticleDTO> getAllAvailableArticles() {
+    return articleDAO.selectAllArticles()
         .stream()
         .filter(article -> article.getAmount() > 0)
         .map(article -> modelMapper.map(article, ArticleDTO.class))
         .collect(Collectors.toList());
   }
 
-  /**
-   * Find article by name.
-   *
-   * @param name Name assigned to Article.
-   * @return List of Article object with the same name.
-   */
-  public List<ArticleDTO> findByName(String name) {
-    return articleRepository.findByName(name)
+  public List<ArticleDTO> getArticleByName(String name) {
+    return articleDAO.selectArticleByName(name)
+        .stream()
+        .map(article -> modelMapper.map(article, ArticleDTO.class))
+        .collect(Collectors.toList());
+  }
+
+  public List<ArticleDTO> getArticleByExternalId(String externalId) {
+    return articleDAO.selectArticleByExternalId(externalId)
         .stream()
         .map(article -> modelMapper.map(article, ArticleDTO.class))
         .toList();
   }
 
-  /**
-   * Find article by external id.
-   *
-   * @param externalId ID of Article assigned by Distributor.
-   * @return List of Article object that match criteria, null otherwise.
-   */
-  public List<ArticleDTO> findByExternalId(String externalId) {
-    return articleRepository.findByExternalId(externalId)
-        .stream()
-        .map(article -> modelMapper.map(article, ArticleDTO.class))
-        .toList();
+  public ArticleDTO createArticle(ArticleRegistrationRequest articleRegistrationRequest) {
+    String externnalId = articleRegistrationRequest.externalId();
+    if (articleDAO.existsArticleWithExternalId(externnalId)) {
+      throw ApiExceptionFactory.articlePresent();
+    }
+
+    Article article = new Article(
+        articleRegistrationRequest.externalId(),
+        articleRegistrationRequest.name(),
+        articleRegistrationRequest.unit(),
+        articleRegistrationRequest.amount(),
+        articleRegistrationRequest.description(),
+        articleRegistrationRequest.buying_price(),
+        articleRegistrationRequest.selling_price());
+
+    articleDAO.insertArticle(article);
+
+    return modelMapper.map(article, ArticleDTO.class);
   }
 
-  /**
-   * Update single article.
-   *
-   * @param id             Id of article.
-   * @param updatedArticle New data that should replace old data.
-   * @return New article data if successful, old data otherwise.
-   */
-  public ArticleDTO updateArticle(Long id, ArticleUpdateDTO updatedArticle) {
-    Article existingArticle = getArticleById(id);
-    modelMapper.map(updatedArticle, existingArticle);
-    return modelMapper.map(articleRepository.save(existingArticle), ArticleDTO.class);
+  public List<ArticleDTO> createArticles(List<ArticleRegistrationRequest> articles) {
+    for (ArticleRegistrationRequest articleReq : articles) {
+      String externnalId = articleReq.externalId();
+      if (articleDAO.existsArticleWithExternalId(externnalId)) {
+        throw ApiExceptionFactory.articlePresent();
+      }
+    }
+
+    List<ArticleDTO> dtos = new ArrayList<>();
+    for (ArticleRegistrationRequest articleReq : articles) {
+      Article article = new Article(
+          articleReq.externalId(),
+          articleReq.name(),
+          articleReq.unit(),
+          articleReq.amount(),
+          articleReq.description(),
+          articleReq.buying_price(),
+          articleReq.selling_price());
+
+      articleDAO.insertArticle(article);
+
+      dtos.add(modelMapper.map(article, ArticleDTO.class));
+    }
+
+    return dtos;
   }
 
-  /**
-   * Delete single article.
-   *
-   * @param id of article that should be deleted.
-   */
   public void deleteArticle(Long id) {
-    articleRepository.deleteById(id);
+    checkIfArticleExistsOrThrow(id);
+    articleDAO.deleteArticleById(id);
   }
 
-  /**
-   * Delete multiple articles.
-   *
-   * @param ids List of Article objects that should be deleted.
-   */
   public void deleteArticle(List<Long> ids) {
-    articleRepository.deleteAllById(ids);
+    ids.forEach(id -> checkIfArticleExistsOrThrow(id));
+    ids.forEach(id -> articleDAO.deleteArticleById(id));
+  }
+
+  public ArticleDTO updateArticle(Long id, ArticleUpdateRequest updatedArticle) {
+    Article article = articleDAO.selectArticleById(id).orElseThrow(ApiExceptionFactory::articleNotFound);
+
+    boolean changes = false;
+
+    if (updatedArticle.name() != null && updatedArticle.name().equals(article.getName())) {
+      article.setName(updatedArticle.name());
+      changes = true;
+    }
+
+    if (updatedArticle.unit() != null && updatedArticle.unit().equals(article.getUnit())) {
+      article.setUnit(updatedArticle.unit());
+      changes = true;
+    }
+
+    if (updatedArticle.amount() != null && updatedArticle.amount().equals(article.getAmount())) {
+      article.setAmount(updatedArticle.amount());
+      changes = true;
+    }
+
+    if (updatedArticle.description() != null && updatedArticle.description().equals(article.getDescription())) {
+      article.setDescription(updatedArticle.description());
+      changes = true;
+    }
+
+    if (updatedArticle.buying_price() != null && updatedArticle.buying_price().equals(article.getBuying_price())) {
+      article.setBuying_price(updatedArticle.buying_price());
+      changes = true;
+    }
+
+    if (updatedArticle.selling_price() != null && updatedArticle.selling_price().equals(article.getSelling_price())) {
+      article.setSelling_price(updatedArticle.selling_price());
+      changes = true;
+    }
+
+    if (changes) {
+      articleDAO.updateArticle(article);
+    }
+
+    return modelMapper.map(article, ArticleDTO.class);
   }
 }
