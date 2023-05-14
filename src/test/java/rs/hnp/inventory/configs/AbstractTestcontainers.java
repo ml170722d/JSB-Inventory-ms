@@ -1,4 +1,4 @@
-package rs.hnp.inventory;
+package rs.hnp.inventory.configs;
 
 import javax.sql.DataSource;
 
