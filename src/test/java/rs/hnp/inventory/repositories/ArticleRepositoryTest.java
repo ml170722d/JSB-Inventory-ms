@@ -11,8 +11,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import rs.hnp.inventory.AbstractTestcontainers;
 import rs.hnp.inventory.InventoryApplication;
+import rs.hnp.inventory.configs.AbstractTestcontainers;
 import rs.hnp.inventory.models.Article;
 
 @DataJpaTest
@@ -21,15 +21,15 @@ import rs.hnp.inventory.models.Article;
 public class ArticleRepositoryTest extends AbstractTestcontainers {
 
   @Autowired
-  private ArticleRepository unitTest;
+  private ArticleRepository articleRepository;
 
   @BeforeEach
   void tearDown() {
-    unitTest.deleteAll();
+    articleRepository.deleteAll();
   }
 
   @Test
-  void getArticlesByName() {
+  void testGetArticlesByName() {
     // arrange
     String name = "test";
     Article article = new Article(
@@ -42,10 +42,10 @@ public class ArticleRepositoryTest extends AbstractTestcontainers {
         Long.valueOf(3),
         Long.valueOf(5));
 
-    unitTest.save(article);
+    articleRepository.save(article);
 
     // act
-    List<Article> expected = unitTest.findByName(name);
+    List<Article> expected = articleRepository.findByName(name);
 
     // assert
     for (Article a : expected) {
@@ -54,7 +54,7 @@ public class ArticleRepositoryTest extends AbstractTestcontainers {
   }
 
   @Test
-  void getArticlesByExternalId() {
+  void testGetArticlesByExternalId() {
     // arrange
     String externalId = "ABC1";
     Article article = new Article(
@@ -67,11 +67,61 @@ public class ArticleRepositoryTest extends AbstractTestcontainers {
         Long.valueOf(3),
         Long.valueOf(5));
 
-    unitTest.save(article);
+    articleRepository.save(article);
 
     // act
-    boolean expect1 = unitTest.findByExternalId(externalId).isPresent();
-    boolean expect2 = unitTest.findByExternalId(externalId + "1").isPresent();
+    boolean expect1 = articleRepository.findByExternalId(externalId).isPresent();
+    boolean expect2 = articleRepository.findByExternalId(externalId + "1").isPresent();
+
+    // assert
+    assertThat(expect1).isTrue();
+    assertThat(expect2).isFalse();
+  }
+
+  @Test
+  void testExistsByExternalId() {
+    // arrange
+    String externalId = "ABC1";
+    Article article = new Article(
+        Long.valueOf(0),
+        externalId,
+        "test",
+        "",
+        Long.valueOf(50),
+        "",
+        Long.valueOf(3),
+        Long.valueOf(5));
+
+    articleRepository.save(article);
+
+    // act
+    boolean expect1 = articleRepository.existsByExternalId(externalId);
+    boolean expect2 = articleRepository.existsByExternalId(externalId + "1");
+
+    // assert
+    assertThat(expect1).isTrue();
+    assertThat(expect2).isFalse();
+  }
+
+  @Test
+  void testExistsByName() {
+    // arrange
+    String name = "test";
+    Article article = new Article(
+        Long.valueOf(0),
+        "ABC1",
+        name,
+        "",
+        Long.valueOf(50),
+        "",
+        Long.valueOf(3),
+        Long.valueOf(5));
+
+    articleRepository.save(article);
+
+    // act
+    boolean expect1 = articleRepository.existsByName(name);
+    boolean expect2 = articleRepository.existsByName(name + "1");
 
     // assert
     assertThat(expect1).isTrue();
