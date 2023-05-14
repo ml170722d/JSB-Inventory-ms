@@ -40,8 +40,8 @@ public class ArticleJPADataAccessService implements ArticleDAO {
   }
 
   @Override
-  public void insertArticle(Article article) {
-    articleRepository.save(article);
+  public Article insertArticle(Article article) {
+    return articleRepository.save(article);
   }
 
   @Override
@@ -65,8 +65,8 @@ public class ArticleJPADataAccessService implements ArticleDAO {
   }
 
   @Override
-  public void updateArticle(Article update) {
-    articleRepository.save(update);
+  public Article updateArticle(Article update) {
+    return articleRepository.save(update);
   }
 
 }

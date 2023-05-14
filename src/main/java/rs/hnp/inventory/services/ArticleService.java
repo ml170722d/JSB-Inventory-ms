@@ -77,9 +77,9 @@ public class ArticleService {
         articleRegistrationRequest.buying_price(),
         articleRegistrationRequest.selling_price());
 
-    articleDAO.insertArticle(article);
+    Article created = articleDAO.insertArticle(article);
 
-    return modelMapper.map(article, ArticleDTO.class);
+    return modelMapper.map(created, ArticleDTO.class);
   }
 
   public List<ArticleDTO> createArticles(List<ArticleRegistrationRequest> articles) {
@@ -101,9 +101,9 @@ public class ArticleService {
           articleReq.buying_price(),
           articleReq.selling_price());
 
-      articleDAO.insertArticle(article);
+      Article created = articleDAO.insertArticle(article);
 
-      dtos.add(modelMapper.map(article, ArticleDTO.class));
+      dtos.add(modelMapper.map(created, ArticleDTO.class));
     }
 
     return dtos;
@@ -154,10 +154,12 @@ public class ArticleService {
       changes = true;
     }
 
-    if (changes) {
-      articleDAO.updateArticle(article);
+    if (!changes) {
+      throw ApiExceptionFactory.noDataChanged();
     }
 
-    return modelMapper.map(article, ArticleDTO.class);
+    Article created = articleDAO.updateArticle(article);
+    return modelMapper.map(created, ArticleDTO.class);
+
   }
 }

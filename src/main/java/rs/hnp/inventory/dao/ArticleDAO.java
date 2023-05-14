@@ -14,7 +14,7 @@ public interface ArticleDAO {
 
   List<Article> selectArticleByName(String name);
 
-  void insertArticle(Article article);
+  Article insertArticle(Article article);
 
   boolean existsArticleById(Long ArticleId);
 
@@ -24,6 +24,6 @@ public interface ArticleDAO {
 
   void deleteArticleById(Long ArticleId);
 
-  void updateArticle(Article update);
+  Article updateArticle(Article update);
 
 }
