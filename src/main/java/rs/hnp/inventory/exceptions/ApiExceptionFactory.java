@@ -19,4 +19,8 @@ public class ApiExceptionFactory {
         return new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, "Requested article does not exist");
     }
 
+    public static ApiException noDataChanged() {
+        return new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, "No data changes found");
+    }
+
 }
